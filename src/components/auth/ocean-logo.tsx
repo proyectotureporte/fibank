@@ -13,7 +13,7 @@ export function OceanLogo({ size = "lg" }: { size?: "sm" | "md" | "lg" }) {
     <div className="flex flex-col items-center gap-1">
       <Image
         src="/logo.png"
-        alt="Ocean Bank"
+        alt="FiduExpress Bank"
         width={width}
         height={height}
         priority

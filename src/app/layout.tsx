@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ocean Bank",
-  description: "Sistema bancario Ocean Bank",
+  title: "FiduExpress Bank",
+  description: "Sistema bancario FiduExpress Bank",
 };
 
 export default function RootLayout({

@@ -14,7 +14,7 @@ export function AdminHeader() {
         <MobileSidebar>
           <AdminSidebarContent />
         </MobileSidebar>
-        <h2 className="text-base md:text-lg font-semibold">Administración Ocean Bank</h2>
+        <h2 className="text-base md:text-lg font-semibold">Administración FiduExpress Bank</h2>
       </div>
       <div className="flex items-center gap-3">
         <Badge variant="outline" className="text-yellow-600 border-yellow-600">

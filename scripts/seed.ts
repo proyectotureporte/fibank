@@ -1,5 +1,5 @@
 /**
- * Seed script for Ocean Bank
+ * Seed script for FiduExpress Bank
  *
  * Run with: npx tsx scripts/seed.ts
  *
@@ -34,7 +34,7 @@ async function seed() {
   const admin = await client.createOrReplace({
     _id: "user-admin",
     _type: "user",
-    name: "Administrador Ocean Bank",
+    name: "Administrador FiduExpress Bank",
     email: "admin@oceanbank.com",
     password: adminPass,
     role: "admin",
