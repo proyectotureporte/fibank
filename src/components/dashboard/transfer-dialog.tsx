@@ -44,6 +44,7 @@ const SWIFT_BANK_MAP: Record<string, string> = {
   UBSWCHZH: "UBS Group AG",
   HONAHNT2: "Banco de Honduras",
   BMILHNTE: "Banco de América Central (BAC)",
+  CAGRSVSS: "Banco Agricola SA",
 };
 
 const BLOCKING_STATUSES = ["pending", "rejected", "in_review"];
