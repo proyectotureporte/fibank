@@ -27,11 +27,13 @@ export async function createAccount(data: {
   owner: { _type: "reference"; _ref: string };
   balance?: number;
   currency?: string;
+  accountStatus?: string;
 }) {
   return sanityWriteClient.create({
     _type: "account",
     balance: 0,
     currency: "USD",
+    accountStatus: "validation_pending",
     createdAt: new Date().toISOString(),
     ...data,
   });
@@ -42,6 +44,13 @@ export async function updateAccountBalance(
   newBalance: number
 ) {
   return sanityWriteClient.patch(id).set({ balance: newBalance }).commit();
+}
+
+export async function updateAccountStatus(
+  id: string,
+  accountStatus: string
+) {
+  return sanityWriteClient.patch(id).set({ accountStatus }).commit();
 }
 
 export async function createTransaction(data: {

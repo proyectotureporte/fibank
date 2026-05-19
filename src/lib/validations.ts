@@ -42,8 +42,19 @@ export const updateBalanceSchema = z.object({
   newBalance: z.number().min(0, "El balance no puede ser negativo"),
 });
 
+export const updateAccountStatusSchema = z.object({
+  accountId: z.string(),
+  accountStatus: z.enum([
+    "pending",
+    "approved",
+    "validation_pending",
+    "completed",
+  ]),
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type TransferInput = z.infer<typeof transferSchema>;
 export type UpdateBalanceInput = z.infer<typeof updateBalanceSchema>;
+export type UpdateAccountStatusInput = z.infer<typeof updateAccountStatusSchema>;

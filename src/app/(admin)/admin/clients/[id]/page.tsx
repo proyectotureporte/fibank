@@ -13,8 +13,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, User, Mail, CreditCard, Save } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AccountStatusTimeline,
+  ACCOUNT_STATUS_STEPS,
+} from "@/components/dashboard/account-status-timeline";
 
 export default function ClientDetailPage() {
   const params = useParams();
@@ -24,6 +35,7 @@ export default function ClientDetailPage() {
   const [loading, setLoading] = useState(true);
   const [balanceEdits, setBalanceEdits] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<string | null>(null);
+  const [statusSaving, setStatusSaving] = useState<string | null>(null);
 
   async function fetchClient() {
     try {
@@ -43,6 +55,27 @@ export default function ClientDetailPage() {
   useEffect(() => {
     fetchClient();
   }, [clientId]);
+
+  async function handleUpdateStatus(accountId: string, accountStatus: string) {
+    setStatusSaving(accountId);
+    try {
+      const res = await fetch("/api/admin/accounts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accountId, accountStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error al actualizar");
+      }
+      toast.success("Estado actualizado");
+      fetchClient();
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setStatusSaving(null);
+    }
+  }
 
   async function handleUpdateBalance(accountId: string) {
     const newBalance = parseFloat(balanceEdits[accountId]);
@@ -140,53 +173,91 @@ export default function ClientDetailPage() {
               Sin cuentas
             </p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {accounts.map((acc: any) => (
                 <div
                   key={acc._id}
-                  className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="rounded-lg border p-4 space-y-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">{acc.accountNumber}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Balance actual: $
-                        {acc.balance?.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </p>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium">{acc.accountNumber}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Balance actual: $
+                          {acc.balance?.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label className="sr-only">Nuevo balance</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Nuevo balance"
+                        className="w-40"
+                        value={balanceEdits[acc._id] ?? ""}
+                        onChange={(e) =>
+                          setBalanceEdits((prev) => ({
+                            ...prev,
+                            [acc._id]: e.target.value,
+                          }))
+                        }
+                      />
+                      <Button
+                        size="sm"
+                        disabled={
+                          saving === acc._id || !balanceEdits[acc._id]
+                        }
+                        onClick={() => handleUpdateBalance(acc._id)}
+                      >
+                        {saving === acc._id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Label className="sr-only">Nuevo balance</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="Nuevo balance"
-                      className="w-40"
-                      value={balanceEdits[acc._id] ?? ""}
-                      onChange={(e) =>
-                        setBalanceEdits((prev) => ({
-                          ...prev,
-                          [acc._id]: e.target.value,
-                        }))
-                      }
+
+                  <Separator />
+
+                  <div className="space-y-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <Label className="text-sm font-medium">
+                        Estado de la cuenta
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={acc.accountStatus || "validation_pending"}
+                          onValueChange={(value) =>
+                            handleUpdateStatus(acc._id, value)
+                          }
+                          disabled={statusSaving === acc._id}
+                        >
+                          <SelectTrigger className="w-[220px]">
+                            <SelectValue placeholder="Seleccionar estado" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {ACCOUNT_STATUS_STEPS.map((step) => (
+                              <SelectItem key={step.value} value={step.value}>
+                                {step.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {statusSaving === acc._id && (
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+                    <AccountStatusTimeline
+                      status={acc.accountStatus || "validation_pending"}
                     />
-                    <Button
-                      size="sm"
-                      disabled={
-                        saving === acc._id || !balanceEdits[acc._id]
-                      }
-                      onClick={() => handleUpdateBalance(acc._id)}
-                    >
-                      {saving === acc._id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Save className="h-4 w-4" />
-                      )}
-                    </Button>
                   </div>
                 </div>
               ))}

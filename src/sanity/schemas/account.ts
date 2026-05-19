@@ -34,6 +34,21 @@ const account = {
       title: "Created At",
       type: "datetime",
     },
+    {
+      name: "accountStatus",
+      title: "Account Status",
+      type: "string",
+      options: {
+        list: [
+          { title: "Pendiente", value: "pending" },
+          { title: "Aprobada", value: "approved" },
+          { title: "Validación Pendiente", value: "validation_pending" },
+          { title: "Completada", value: "completed" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "validation_pending",
+    },
   ],
 };
 

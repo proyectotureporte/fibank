@@ -11,6 +11,7 @@ import {
 import { DollarSign, ArrowUpRight, Clock } from "lucide-react";
 import { TransferDialog } from "@/components/dashboard/transfer-dialog";
 import { RecentTransactions } from "@/components/dashboard/recent-transactions";
+import { AccountStatusTimeline } from "@/components/dashboard/account-status-timeline";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -91,6 +92,17 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Estado de la Cuenta</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AccountStatusTimeline
+            status={primaryAccount?.accountStatus || "validation_pending"}
+          />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

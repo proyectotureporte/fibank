@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { updateAccountBalance } from "@/sanity/mutations";
-import { updateBalanceSchema } from "@/lib/validations";
+import { updateAccountBalance, updateAccountStatus } from "@/sanity/mutations";
+import {
+  updateBalanceSchema,
+  updateAccountStatusSchema,
+} from "@/lib/validations";
 
 export async function PATCH(req: Request) {
   try {
@@ -11,8 +14,23 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const parsed = updateBalanceSchema.safeParse(body);
 
+    if (typeof body?.accountStatus === "string") {
+      const parsed = updateAccountStatusSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json(
+          { error: parsed.error.issues?.[0]?.message || "Datos inválidos" },
+          { status: 400 }
+        );
+      }
+      await updateAccountStatus(
+        parsed.data.accountId,
+        parsed.data.accountStatus
+      );
+      return NextResponse.json({ message: "Estado actualizado" });
+    }
+
+    const parsed = updateBalanceSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
         { error: parsed.error.issues?.[0]?.message || "Datos inválidos" },
